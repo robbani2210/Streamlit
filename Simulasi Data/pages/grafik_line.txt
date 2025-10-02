@@ -1,0 +1,41 @@
+import streamlit as st
+from generator.data_generator import generate_data
+import pandas as pd
+
+st.set_page_config(page_title="Grafik dengan Filter", layout="wide")
+filter_global()
+st.title("📊 Grafik dengan Filter Waktu")
+
+if "data_listrik" not in st.session_state:
+    st.warning("⚠️ Data belum dibuat.")
+else:
+    df = st.session_state["data_listrik"]
+
+    # # Pilih rentang waktu
+    # pilihan = st.radio(
+    #     "Pilih rentang waktu:",
+    #     ("7 hari", "3 hari", "1 hari"),
+    #     horizontal=True
+    # )
+
+    if pilihan == "7 hari":
+        filtered_df = df[df["timestamp"] >= df["timestamp"].max() - pd.Timedelta(days=7)]
+    elif pilihan == "3 hari":
+        filtered_df = df[df["timestamp"] >= df["timestamp"].max() - pd.Timedelta(days=3)]
+    else:
+        filtered_df = df[df["timestamp"] >= df["timestamp"].max() - pd.Timedelta(days=1)]
+
+    # Pilih jenis data
+    jenis_data = st.selectbox("Pilih jenis data:", ["Arus", "Volt"])
+
+    if jenis_data == "Arus":
+        kolom = ["arus_lokasi1", "arus_lokasi2"]
+        judul = "Grafik Arus Listrik"
+    else:
+        kolom = ["volt_lokasi1", "volt_lokasi2"]
+        judul = "Grafik Tegangan Listrik"
+
+    st.subheader(f"{judul} - {pilihan}")
+    st.line_chart(filtered_df.set_index("timestamp")[kolom])
+
+
